@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Tools Hub</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1 id="siteTitle">🤖 AI 도구 모음</h1>
+        <p id="siteDesc">전 세계 AI들을 한눈에 비교하고 사용하세요.</p>
+      </div>
+
+      <div class="top-actions">
+        <button id="translateBtn" class="translate-btn">🌐 언어 변경</button>
+        <select id="sortSelect" title="정렬">
+          <option value="usage">사용지수 높은순</option>
+          <option value="name">이름순(A→Z)</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <input id="searchInput" type="text" placeholder="예: ChatGPT / 이미지 / 번역 / 영상" />
+      <div id="categoryButtons" class="category-buttons"></div>
+    </div>
+
+    <div id="aiContainer" class="grid"></div>
+
+    <div id="footerNote" class="footer-note">
+      ※ '사용지수(추정)'는 정확한 전세계 사용률이 아니라 비교용 지표입니다.
+    </div>
+  </div>
+
+  <!-- 언어 선택 모달 -->
+  <div id="langModal" class="lang-modal">
+    <div class="lang-modal-content">
+      <h2>🌐 언어 선택 / Select Language</h2>
+      <div id="langOptions" class="lang-options"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
