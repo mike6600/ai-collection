@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Tools Hub</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1 id="siteTitle">🤖 AI 도구 모음</h1>
+        <p id="siteDesc">전 세계 AI들을 한눈에 비교하고 사용하세요.</p>
+      </div>
+
+      <div class="top-actions">
+        <button id="translateBtn" class="translate-btn">🌐 언어 변경</button>
+        <select id="sortSelect" title="정렬">
+          <option value="usage">사용지수 높은순</option>
+          <option value="name">이름순(A→Z)</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <input id="searchInput" type="text" placeholder="예: ChatGPT / 이미지 / 번역 / 영상" />
+      <div id="categoryButtons" class="category-buttons"></div>
+    </div>
+
+    <div id="aiContainer" class="grid"></div>
+
+    <div id="footerNote" class="footer-note">
+      ※ '사용지수(추정)'는 정확한 전세계 사용률이 아니라 비교용 지표입니다.
+    </div>
+  </div>
+
+  <!-- 언어 선택 모달 -->
+  <div id="langModal" class="lang-modal">
+    <div class="lang-modal-content">
+      <h2>🌐 언어 선택 / Select Language</h2>
+      <div id="langOptions" class="lang-options"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+// ==========================================
+// 1. 번역 데이터 (8개 언어)
+// ==========================================
+const translations = {
+  ko: {
+    title: "🤖 AI 도구 모음",
+    desc: "전 세계 AI들을 한눈에 비교하고 사용하세요.",
+    searchPlaceholder: "예: ChatGPT / 이미지 / 번역 / 영상",
+    usageText: "사용지수(추정)",
+    noResults: "결과 없음",
+    noResultsDesc: "검색어나 카테고리를 바꿔보세요.",
+    footerNote: "※ '사용지수(추정)'는 정확한 전세계 사용률이 아니라 비교용 지표입니다.",
+    translateBtn: "🌐 언어 변경",
+    sortUsage: "사용지수 높은순",
+    sortName: "이름순(A→Z)",
+    all: "전체",
+    chat: "챗봇",
+    search: "검색/리서치",
+    image: "이미지",
+    video: "영상",
+    audio: "음성/음악",
+    coding: "코딩",
+    writing: "글쓰기",
+    design: "디자인",
+    productivity: "생산성",
+    education: "교육",
+    goBtn: "바로가기",
+    priceLabel: "가격",
+    koSupport: "한국어"
+  },
+  en: {
+    title: "🤖 AI Tools Hub",
+    desc: "Compare and use AI tools from around the world at a glance.",
+    searchPlaceholder: "Ex: ChatGPT / Image / Translation / Video",
+    usageText: "Usage Index (Est.)",
+    noResults: "No Results",
+    noResultsDesc: "Try changing your search or category.",
+    footerNote: "※ 'Usage Index' is a comparative metric, not exact global usage rates.",
+    translateBtn: "🌐 Translate",
+    sortUsage: "Usage (High→Low)",
+    sortName: "Name (A→Z)",
+    all: "All",
+    chat: "Chat",
+    search: "Search",
+    image: "Image",
+    video: "Video",
+    audio: "Audio",
+    coding: "Coding",
+    writing: "Writing",
+    design: "Design",
+    productivity: "Productivity",
+    education: "Education",
+    goBtn: "Go →",
+    priceLabel: "Price",
+    koSupport: "Korean"
+  },
+  zh: {
+    title: "🤖 AI工具合集",
+    desc: "比较和使用来自世界各地的AI工具，一目了然。",
+    searchPlaceholder: "例如：ChatGPT / 图像 / 翻译 / 视频",
+    usageText: "使用指数(估计)",
+    noResults: "无结果",
+    noResultsDesc: "请尝试更改搜索词或类别。",
+    footerNote: "※ '使用指数(估计)'并非精确的全球使用率，仅供比较参考。",
+    translateBtn: "🌐 翻译",
+    sortUsage: "使用指数(高→低)",
+    sortName: "名称(A→Z)",
+    all: "全部",
+    chat: "聊天",
+    search: "搜索",
+    image: "图像",
+    video: "视频",
+    audio: "音频",
+    coding: "编程",
+    writing: "写作",
+    design: "设计",
+    productivity: "生产力",
+    education: "教育",
+    goBtn: "前往 →",
+    priceLabel: "价格",
+    koSupport: "韩语"
+  },
+  ja: {
+    title: "🤖 AIツールコレクション",
+    desc: "世界中のAIツールを一目で比較して使用できます。",
+    searchPlaceholder: "例：ChatGPT / 画像 / 翻訳 / 動画",
+    usageText: "使用指数(推定)",
+    noResults: "結果なし",
+    noResultsDesc: "検索語句やカテゴリを変更してください。",
+    footerNote: "※『使用指数(推定)』は正確な世界使用率ではなく、比較用の指標です。",
+    translateBtn: "🌐 翻訳",
+    sortUsage: "使用指数(高→低)",
+    sortName: "名前(A→Z)",
+    all: "すべて",
+    chat: "チャット",
+    search: "検索",
+    image: "画像",
+    video: "動画",
+    audio: "音声",
+    coding: "コーディング",
+    writing: "執筆",
+    design: "デザイン",
+    productivity: "生産性",
+    education: "教育",
+    goBtn: "移動 →",
+    priceLabel: "価格",
+    koSupport: "韓国語"
+  },
+  de: {
+    title: "🤖 KI-Tools Sammlung",
+    desc: "Vergleichen und nutzen Sie KI-Tools aus der ganzen Welt auf einen Blick.",
+    searchPlaceholder: "z.B. ChatGPT / Bild / Übersetzung / Video",
+    usageText: "Nutzungsindex (geschätzt)",
+    noResults: "Keine Ergebnisse",
+    noResultsDesc: "Versuchen Sie, Suchbegriff oder Kategorie zu ändern.",
+    footerNote: "※ 'Nutzungsindex' ist eine Vergleichsmetrik, keine exakte globale Nutzungsrate.",
+    translateBtn: "🌐 Übersetzen",
+    sortUsage: "Nutzung (Hoch→Niedrig)",
+    sortName: "Name (A→Z)",
+    all: "Alle",
+    chat: "Chat",
+    search: "Suche",
+    image: "Bild",
+    video: "Video",
+    audio: "Audio",
+    coding: "Codieren",
+    writing: "Schreiben",
+    design: "Design",
+    productivity: "Produktivität",
+    education: "Bildung",
+    goBtn: "Gehen →",
+    priceLabel: "Preis",
+    koSupport: "Koreanisch"
+  },
+  fr: {
+    title: "🤖 Collection d'outils IA",
+    desc: "Comparez et utilisez des outils d'IA du monde entier en un coup d'œil.",
+    searchPlaceholder: "Ex: ChatGPT / Image / Traduction / Vidéo",
+    usageText: "Indice d'utilisation (est.)",
+    noResults: "Aucun résultat",
+    noResultsDesc: "Essayez de changer de terme ou de catégorie.",
+    footerNote: "※ 'Indice d'utilisation' est une métrique comparative, pas un taux d'utilisation mondial exact.",
+    translateBtn: "🌐 Traduire",
+    sortUsage: "Utilisation (Haut→Bas)",
+    sortName: "Nom (A→Z)",
+    all: "Tous",
+    chat: "Chat",
+    search: "Recherche",
+    image: "Image",
+    video: "Vidéo",
+    audio: "Audio",
+    coding: "Code",
+    writing: "Écriture",
+    design: "Design",
+    productivity: "Productivité",
+    education: "Éducation",
+    goBtn: "Aller →",
+    priceLabel: "Prix",
+    koSupport: "Coréen"
+  },
+  ru: {
+    title: "🤖 Коллекция инструментов ИИ",
+    desc: "Сравнивайте и используйте инструменты ИИ со всего мира одним взглядом.",
+    searchPlaceholder: "Напр: ChatGPT / Изображение / Перевод / Видео",
+    usageText: "Индекс использования (оценка)",
+    noResults: "Нет результатов",
+    noResultsDesc: "Попробуйте изменить запрос или категорию.",
+    footerNote: "※ 'Индекс использования' - сравнительная метрика, а не точный мировой рейтинг.",
+    translateBtn: "🌐 Перевести",
+    sortUsage: "Использование (Выс→Низ)",
+    sortName: "Имя (А→Я)",
+    all: "Все",
+    chat: "Чат",
+    search: "Поиск",
+    image: "Изображение",
+    video: "Видео",
+    audio: "Аудио",
+    coding: "Кодинг",
+    writing: "Письмо",
+    design: "Дизайн",
+    productivity: "Продуктивность",
+    education: "Образование",
+    goBtn: "Перейти →",
+    priceLabel: "Цена",
+    koSupport: "Корейский"
+  },
+  hi: {
+    title: "🤖 AI टूल्स संग्रह",
+    desc: "दुनिया भर के AI टूल्स की तुलना करें और उपयोग करें।",
+    searchPlaceholder: "उदा: ChatGPT / छवि / अनुवाद / वीडियो",
+    usageText: "उपयोग सूचकांक (अनुमानित)",
+    noResults: "कोई परिणाम नहीं",
+    noResultsDesc: "कृपया खोज शब्द या श्रेणी बदलें।",
+    footerNote: "※ 'उपयोग सूचकांक' सटीक वैश्विक उपयोग दर नहीं है, केवल तुलना के लिए।",
+    translateBtn: "🌐 अनुवाद",
+    sortUsage: "उपयोग (उच्च→निम्न)",
+    sortName: "नाम (A→Z)",
+    all: "सभी",
+    chat: "चैट",
+    search: "खोज",
+    image: "छवि",
+    video: "वीडियो",
+    audio: "ऑडियो",
+    coding: "कोडिंग",
+    writing: "लेखन",
+    design: "डिज़ाइन",
+    productivity: "उत्पादकता",
+    education: "शिक्षा",
+    goBtn: "जाओ →",
+    priceLabel: "मूल्य",
+    koSupport: "कोरियाई"
+  }
+};
+
+// ==========================================
+// 2. AI 데이터 (30개) - 언어별 설명 포함
+// ==========================================
+const aiData = [
+  { 
+    name: "ChatGPT", 
+    category: "chat", 
+    desc: {
+      ko: "범용 챗봇/문서/아이디어/코딩까지 다 되는 대표 AI",
+      en: "Versatile chatbot for documents, ideas, coding - the leading AI",
+      zh: "通用聊天机器人/文档/创意/编程全能代表AI",
+      ja: "汎用チャットボット/文書/アイデア/コーディングまでできる代表AI",
+      de: "Vielseitiger Chatbot für Dokumente, Ideen, Programmierung - führende KI",
+      fr: "Chatbot polyvalent pour documents, idées, programmation - IA leader",
+      ru: "Универсальный чат-бот для документов, идей, программирования - ведущий ИИ",
+      hi: "दस्तावेज़, विचार, कोडिंग के लिए बहुमुखी चैटबॉट - प्रमुख AI"
+    },
+    link: "https://chat.openai.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 100 
+  },
+  { 
+    name: "Gemini", 
+    category: "chat", 
+    desc: {
+      ko: "구글의 LLM, 검색/워크스페이스 연계 강점",
+      en: "Google's LLM with strong search and Workspace integration",
+      zh: "谷歌的LLM，搜索和工作空间联动优势",
+      ja: "GoogleのLLM、検索とWorkspace連携が強み",
+      de: "Googles LLM mit starker Suche und Workspace-Integration",
+      fr: "LLM de Google avec forte intégration recherche et Workspace",
+      ru: "LLM от Google с сильной интеграцией поиска и Workspace",
+      hi: "Google का LLM, खोज और Workspace एकीकरण मजबूत"
+    },
+    link: "https://gemini.google.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 90 
+  },
+  { 
+    name: "Microsoft Copilot", 
+    category: "chat", 
+    desc: {
+      ko: "Bing/Windows/Office 생태계와 연결되는 챗봇",
+      en: "Chatbot integrated with Bing/Windows/Office ecosystem",
+      zh: "与Bing/Windows/Office生态系统连接的聊天机器人",
+      ja: "Bing/Windows/Officeエコシステムと連携するチャットボット",
+      de: "Chatbot integriert mit Bing/Windows/Office-Ökosystem",
+      fr: "Chatbot intégré à l'écosystème Bing/Windows/Office",
+      ru: "Чат-бот, интегрированный с экосистемой Bing/Windows/Office",
+      hi: "Bing/Windows/Office पारिस्थितिकी तंत्र से जुड़ा चैटबॉट"
+    },
+    link: "https://copilot.microsoft.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 88 
+  },
+  { 
+    name: "Claude", 
+    category: "chat", 
+    desc: {
+      ko: "긴 글/문서 분석과 글쓰기에 강한 챗봇",
+      en: "Chatbot strong in long text/document analysis and writing",
+      zh: "擅长长文本/文档分析和写作的聊天机器人",
+      ja: "長文/文書分析とライティングに強いチャットボット",
+      de: "Chatbot stark in langer Text/Dokumentanalyse und Schreiben",
+      fr: "Chatbot fort en analyse de texte long/document et écriture",
+      ru: "Чат-бот силен в анализе длинных текстов/документов и письме",
+      hi: "लंबे पाठ/दस्तावेज़ विश्लेषण और लेखन में मजबूत चैटबॉट"
+    },
+    link: "https://claude.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 82 
+  },
+  { 
+    name: "Perplexity", 
+    category: "search", 
+    desc: {
+      ko: "출처 기반 AI 검색/요약에 강함",
+      en: "Source-based AI search and summarization",
+      zh: "基于来源的AI搜索/摘要",
+      ja: "出典ベースのAI検索/要約",
+      de: "Quellenbasierte KI-Suche und Zusammenfassung",
+      fr: "Recherche IA basée sur sources et résumé",
+      ru: "Поиск ИИ на основе источников и резюмирование",
+      hi: "स्रोत-आधारित AI खोज और सारांश"
+    },
+    link: "https://www.perplexity.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 78 
+  },
+  { 
+    name: "Poe", 
+    category: "chat", 
+    desc: {
+      ko: "여러 AI 모델을 한 곳에서 쓰는 허브",
+      en: "Hub for using multiple AI models in one place",
+      zh: "在一个地方使用多个AI模型的中心",
+      ja: "複数のAIモデルを一箇所で使えるハブ",
+      de: "Hub für mehrere KI-Modelle an einem Ort",
+      fr: "Hub pour utiliser plusieurs modèles IA en un seul endroit",
+      ru: "Хаб для использования нескольких моделей ИИ в одном месте",
+      hi: "एक स्थान पर कई AI मॉडल उपयोग करने का हब"
+    },
+    link: "https://poe.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 62 
+  },
+  { 
+    name: "Character.AI", 
+    category: "chat", 
+    desc: {
+      ko: "캐릭터 대화/역할 기반 챗봇 플랫폼",
+      en: "Character-based role-playing chatbot platform",
+      zh: "基于角色/扮演的聊天机器人平台",
+      ja: "キャラクター対話/ロールプレイベースのチャットボットプラットフォーム",
+      de: "Charakterbasiertes Rollenspiel-Chatbot-Plattform",
+      fr: "Plateforme de chatbot basée sur rôle/jouer des personnages",
+      ru: "Платформа чат-бота на основе ролей/персонажей",
+      hi: "चरित्र-आधारित भूमिका निभाने वाला चैटबॉट प्लेटफ़ॉर्म"
+    },
+    link: "https://character.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 70 
+  },
+  { 
+    name: "Hugging Face", 
+    category: "productivity", 
+    desc: {
+      ko: "오픈소스 모델/데모(Spaces) 모음",
+      en: "Collection of open-source models and demos (Spaces)",
+      zh: "开源模型/演示（Spaces）合集",
+      ja: "オープンソースモデル/デモ（Spaces）のコレクション",
+      de: "Sammlung von Open-Source-Modellen und Demos (Spaces)",
+      fr: "Collection de modèles open-source et démos (Spaces)",
+      ru: "Коллекция моделей с открытым исходным кодом и демо (Spaces)",
+      hi: "ओपन-सोर्स मॉडल और डेमो (Spaces) का संग्रह"
+    },
+    link: "https://huggingface.co/", 
+    price: { ko: "무료", en: "Free", zh: "免费", ja: "無料", de: "Kostenlos", fr: "Gratuit", ru: "Бесплатно", hi: "मुफ़्त" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 65 
+  },
+  { 
+    name: "Midjourney", 
+    category: "image", 
+    desc: {
+      ko: "고퀄 이미지 생성(디스코드 중심)",
+      en: "High-quality image generation (Discord-based)",
+      zh: "高质量图像生成（基于Discord）",
+      ja: "高品質画像生成（Discord中心）",
+      de: "Hochwertige Bildgenerierung (Discord-basiert)",
+      fr: "Génération d'images haute qualité (basé sur Discord)",
+      ru: "Генерация высококачественных изображений (на основе Discord)",
+      hi: "उच्च गुणवत्ता छवि जनरेशन (Discord-आधारित)"
+    },
+    link: "https://www.midjourney.com/", 
+    price: { ko: "유료", en: "Paid", zh: "付费", ja: "有料", de: "Bezahlt", fr: "Payant", ru: "Платно", hi: "भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 84 
+  },
+  { 
+    name: "Adobe Firefly", 
+    category: "image", 
+    desc: {
+      ko: "어도비의 생성형 이미지(PS/Express 연계)",
+      en: "Adobe's generative image tool (integrated with PS/Express)",
+      zh: "Adobe的生成式图像工具（与PS/Express集成）",
+      ja: "Adobeの生成画像ツール（PS/Express連携）",
+      de: "Adobes generatives Bildtool (mit PS/Express integriert)",
+      fr: "Outil d'image générative d'Adobe (intégré à PS/Express)",
+      ru: "Генеративный инструмент изображений Adobe (интегрирован с PS/Express)",
+      hi: "Adobe का जनरेटिव छवि टूल (PS/Express के साथ एकीकृत)"
+    },
+    link: "https://firefly.adobe.com/", 
+    price: { ko: "부분무료+유료", en: "Freemium", zh: "部分免费+付费", ja: "一部無料+有料", de: "Freemium", fr: "Freemium", ru: "Частично бесплатно", hi: "आंशिक मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 73 
+  },
+  { 
+    name: "Canva", 
+    category: "design", 
+    desc: {
+      ko: "디자인 템플릿 + AI 이미지/문서 기능",
+      en: "Design templates + AI image/document features",
+      zh: "设计模板+AI图像/文档功能",
+      ja: "デザインテンプレート+AI画像/文書機能",
+      de: "Designvorlagen + KI-Bild/Dokument-Funktionen",
+      fr: "Modèles de design + fonctionnalités IA image/document",
+      ru: "Шаблоны дизайна + функции ИИ изображений/документов",
+      hi: "डिज़ाइन टेम्पलेट्स + AI छवि/दस्तावेज़ सुविधाएँ"
+    },
+    link: "https://www.canva.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 80 
+  },
+  { 
+    name: "Leonardo AI", 
+    category: "image", 
+    desc: {
+      ko: "컨셉아트/게임 스타일 이미지 생성에 강함",
+      en: "Strong in concept art/game-style image generation",
+      zh: "擅长概念艺术/游戏风格图像生成",
+      ja: "コンセプトアート/ゲームスタイル画像生成に強い",
+      de: "Stark in Konzeptkunst/Spielstil-Bildgenerierung",
+      fr: "Fort en génération d'images style art conceptuel/jeu",
+      ru: "Силен в генерации изображений в стиле концепт-арта/игр",
+      hi: "कॉन्सेप्ट आर्ट/गेम स्टाइल छवि जनरेशन में मजबूत"
+    },
+    link: "https://leonardo.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 60 
+  },
+  { 
+    name: "Ideogram", 
+    category: "image", 
+    desc: {
+      ko: "글자 들어간 이미지(포스터/로고)에 강점",
+      en: "Strong at images with text (posters/logos)",
+      zh: "擅长带文字的图像（海报/标志）",
+      ja: "文字入り画像（ポスター/ロゴ）に強み",
+      de: "Stark bei Bildern mit Text (Poster/Logos)",
+      fr: "Fort en images avec texte (affiches/logos)",
+      ru: "Силен в изображениях с текстом (постеры/логотипы)",
+      hi: "टेक्स्ट वाली छवियों (पोस्टर/लोगो) में मजबूत"
+    },
+    link: "https://ideogram.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 58 
+  },
+  { 
+    name: "DreamStudio", 
+    category: "image", 
+    desc: {
+      ko: "Stable Diffusion 계열 이미지 생성",
+      en: "Stable Diffusion-based image generation",
+      zh: "基于Stable Diffusion的图像生成",
+      ja: "Stable Diffusionベースの画像生成",
+      de: "Stable Diffusion-basierte Bildgenerierung",
+      fr: "Génération d'images basée sur Stable Diffusion",
+      ru: "Генерация изображений на основе Stable Diffusion",
+      hi: "Stable Diffusion-आधारित छवि जनरेशन"
+    },
+    link: "https://dreamstudio.ai/", 
+    price: { ko: "유료(크레딧)", en: "Paid(Credits)", zh: "付费(积分)", ja: "有料(クレジット)", de: "Bezahlt(Credits)", fr: "Payant(Crédits)", ru: "Платно(Кредиты)", hi: "भुगतान(क्रेडिट)" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 55 
+  },
+  { 
+    name: "Runway", 
+    category: "video", 
+    desc: {
+      ko: "텍스트/이미지→영상 생성 및 편집 툴",
+      en: "Text/image to video generation and editing tool",
+      zh: "文本/图像→视频生成及编辑工具",
+      ja: "テキスト/画像→動画生成及び編集ツール",
+      de: "Text/Bild zu Video-Generierung und Bearbeitungstool",
+      fr: "Outil de génération et édition texte/image → vidéo",
+      ru: "Инструмент генерации и редактирования текст/изображение → видео",
+      hi: "टेक्स्ट/छवि → वीडियो जनरेशन और संपादन टूल"
+    },
+    link: "https://runwayml.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 72 
+  },
+  { 
+    name: "Pika", 
+    category: "video", 
+    desc: {
+      ko: "짧은 영상 생성(텍스트/이미지 기반)",
+      en: "Short video generation (text/image based)",
+      zh: "短视频生成（基于文本/图像）",
+      ja: "短い動画生成（テキスト/画像ベース）",
+      de: "Kurze Videogenerierung (text/bildbasiert)",
+      fr: "Génération de courtes vidéos (basé texte/image)",
+      ru: "Генерация коротких видео (на основе текста/изображений)",
+      hi: "छोटे वीडियो जनरेशन (टेक्स्ट/छवि आधारित)"
+    },
+    link: "https://pika.art/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 66 
+  },
+  { 
+    name: "Luma Dream Machine", 
+    category: "video", 
+    desc: {
+      ko: "고품질 텍스트→영상 생성(성장 중)",
+      en: "High-quality text-to-video generation (growing)",
+      zh: "高质量文本→视频生成（发展中）",
+      ja: "高品質テキスト→動画生成（成長中）",
+      de: "Hochwertige Text-zu-Video-Generierung (wachsend)",
+      fr: "Génération texte→vidéo haute qualité (en croissance)",
+      ru: "Генерация текст→видео высокого качества (растёт)",
+      hi: "उच्च गुणवत्ता टेक्स्ट→वीडियो जनरेशन (बढ़ रहा)"
+    },
+    link: "https://lumalabs.ai/dream-machine", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 64 
+  },
+  { 
+    name: "CapCut", 
+    category: "video", 
+    desc: {
+      ko: "모바일/PC 영상편집 + 자동 자막/템플릿",
+      en: "Mobile/PC video editing + auto subtitles/templates",
+      zh: "移动/PC视频编辑+自动字幕/模板",
+      ja: "モバイル/PC動画編集+自動字幕/テンプレート",
+      de: "Mobile/PC-Videobearbeitung + automatische Untertitel/Vorlagen",
+      fr: "Édition vidéo mobile/PC + sous-titres automatiques/modèles",
+      ru: "Мобильное/ПК редактирование видео + автоматические субтитры/шаблоны",
+      hi: "मोबाइल/PC वीडियो संपादन + स्वचालित उपशीर्षक/टेम्पलेट"
+    },
+    link: "https://www.capcut.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 76 
+  },
+  { 
+    name: "ElevenLabs", 
+    category: "audio", 
+    desc: {
+      ko: "자연스러운 TTS/음성 합성",
+      en: "Natural TTS/voice synthesis",
+      zh: "自然的TTS/语音合成",
+      ja: "自然なTTS/音声合成",
+      de: "Natürliche TTS/Stimmsynthese",
+      fr: "Synthèse vocale/TTS naturelle",
+      ru: "Естественный TTS/синтез голоса",
+      hi: "प्राकृतिक TTS/आवाज संश्लेषण"
+    },
+    link: "https://elevenlabs.io/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 68 
+  },
+  { 
+    name: "Suno", 
+    category: "audio", 
+    desc: {
+      ko: "가사/스타일로 노래 생성",
+      en: "Generate songs from lyrics/style",
+      zh: "根据歌词/风格生成歌曲",
+      ja: "歌詞/スタイルから曲を生成",
+      de: "Generiere Songs aus Lyrics/Stil",
+      fr: "Générer des chansons à partir de paroles/style",
+      ru: "Генерация песен из текста/стиля",
+      hi: "गीत/शैली से गाने जनरेट करें"
+    },
+    link: "https://suno.ai/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 74 
+  },
+  { 
+    name: "Udio", 
+    category: "audio", 
+    desc: {
+      ko: "음악 생성(퀄리티 좋다는 평 많음)",
+      en: "Music generation (known for good quality)",
+      zh: "音乐生成（以质量好著称）",
+      ja: "音楽生成（品質が良いと評判）",
+      de: "Musikgenerierung (bekannt für gute Qualität)",
+      fr: "Génération musicale (connue pour bonne qualité)",
+      ru: "Генерация музыки (известна хорошим качеством)",
+      hi: "संगीत जनरेशन (अच्छी गुणवत्ता के लिए जाना जाता)"
+    },
+    link: "https://www.udio.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 60 
+  },
+  { 
+    name: "GitHub Copilot", 
+    category: "coding", 
+    desc: {
+      ko: "IDE에서 코드 자동완성/추천",
+      en: "Code autocompletion/suggestions in IDE",
+      zh: "IDE中的代码自动完成/建议",
+      ja: "IDEでのコード自動補完/提案",
+      de: "Code-Autovervollständigung/Vorschläge in IDE",
+      fr: "Autocomplétion/suggestions de code dans l'IDE",
+      ru: "Автодополнение/предложения кода в IDE",
+      hi: "IDE में कोड ऑटोकम्प्लीशन/सुझाव"
+    },
+    link: "https://github.com/features/copilot", 
+    price: { ko: "유료(학생혜택)", en: "Paid(Student discount)", zh: "付费(学生优惠)", ja: "有料(学生特典)", de: "Bezahlt(Studentenrabatt)", fr: "Payant(Réduction étudiant)", ru: "Платно(Скидка студентам)", hi: "भुगतान(छात्र छूट)" },
+    ko: { ko: "무관", en: "N/A", zh: "无关", ja: "無関係", de: "N/A", fr: "N/A", ru: "Н/П", hi: "लागू नहीं" },
+    usage: 83 
+  },
+  { 
+    name: "Cursor", 
+    category: "coding", 
+    desc: {
+      ko: "AI 중심 코드 에디터(IDE)",
+      en: "AI-focused code editor (IDE)",
+      zh: "以AI为中心的代码编辑器（IDE）",
+      ja: "AI中心のコードエディター（IDE）",
+      de: "KI-fokussierter Code-Editor (IDE)",
+      fr: "Éditeur de code axé IA (IDE)",
+      ru: "Редактор кода с фокусом на ИИ (IDE)",
+      hi: "AI-केंद्रित कोड एडिटर (IDE)"
+    },
+    link: "https://www.cursor.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "무관", en: "N/A", zh: "无关", ja: "無関係", de: "N/A", fr: "N/A", ru: "Н/П", hi: "लागू नहीं" },
+    usage: 67 
+  },
+  { 
+    name: "Codeium", 
+    category: "coding", 
+    desc: {
+      ko: "코드 자동완성/챗(무료 플랜 강함)",
+      en: "Code autocompletion/chat (strong free plan)",
+      zh: "代码自动完成/聊天（免费计划强大）",
+      ja: "コード自動補完/チャット（無料プランが強い）",
+      de: "Code-Autovervollständigung/Chat (starker kostenloser Plan)",
+      fr: "Autocomplétion/chat de code (plan gratuit fort)",
+      ru: "Автодополнение/чат кода (сильный бесплатный план)",
+      hi: "कोड ऑटोकम्प्लीशन/चैट (मजबूत मुफ्त योजना)"
+    },
+    link: "https://codeium.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "무관", en: "N/A", zh: "无关", ja: "無関係", de: "N/A", fr: "N/A", ru: "Н/П", hi: "लागू नहीं" },
+    usage: 57 
+  },
+  { 
+    name: "Replit", 
+    category: "coding", 
+    desc: {
+      ko: "브라우저에서 코딩/배포 + AI 도우미",
+      en: "Code and deploy in browser + AI assistant",
+      zh: "浏览器中编码/部署+AI助手",
+      ja: "ブラウザでコーディング/デプロイ+AIアシスタント",
+      de: "Code und Bereitstellung im Browser + KI-Assistent",
+      fr: "Coder et déployer dans le navigateur + assistant IA",
+      ru: "Кодирование и развертывание в браузере + помощник ИИ",
+      hi: "ब्राउज़र में कोड और डिप्लॉय + AI सहायक"
+    },
+    link: "https://replit.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "무관", en: "N/A", zh: "无关", ja: "無関係", de: "N/A", fr: "N/A", ru: "Н/П", hi: "लागू नहीं" },
+    usage: 61 
+  },
+  { 
+    name: "Notion AI", 
+    category: "productivity", 
+    desc: {
+      ko: "노션에서 요약/정리/작성 보조",
+      en: "Summarize/organize/write in Notion",
+      zh: "在Notion中总结/整理/写作",
+      ja: "Notionでの要約/整理/ライティング支援",
+      de: "Zusammenfassen/Organisieren/Schreiben in Notion",
+      fr: "Résumer/organiser/écrire dans Notion",
+      ru: "Резюмирование/организация/письмо в Notion",
+      hi: "Notion में सारांश/संगठन/लेखन"
+    },
+    link: "https://www.notion.so/product/ai", 
+    price: { ko: "유료(애드온)", en: "Paid(Add-on)", zh: "付费(附加)", ja: "有料(アドオン)", de: "Bezahlt(Add-on)", fr: "Payant(Extension)", ru: "Платно(Дополнение)", hi: "भुगतान(ऐड-ऑन)" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 69 
+  },
+  { 
+    name: "Grammarly", 
+    category: "writing", 
+    desc: {
+      ko: "영어 문법 교정/글쓰기 보조",
+      en: "English grammar correction/writing assistant",
+      zh: "英语语法校正/写作助手",
+      ja: "英語文法校正/ライティングアシスタント",
+      de: "Englische Grammatikkorrektur/Schreibassistent",
+      fr: "Correction de grammaire anglaise/assistant d'écriture",
+      ru: "Коррекция английской грамматики/помощник в письме",
+      hi: "अंग्रेजी व्याकरण सुधार/लेखन सहायक"
+    },
+    link: "https://www.grammarly.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "영어중심", en: "English-focused", zh: "英语为主", ja: "英語中心", de: "Englisch-fokussiert", fr: "Axé anglais", ru: "Англоязычный", hi: "अंग्रेजी-केंद्रित" },
+    usage: 77 
+  },
+  { 
+    name: "DeepL", 
+    category: "writing", 
+    desc: {
+      ko: "번역/작문에 강한 번역기(영→한 등)",
+      en: "Strong translation/writing (EN→KO etc.)",
+      zh: "强大的翻译/写作（英→韩等）",
+      ja: "翻訳/ライティングに強い（英→韓など）",
+      de: "Starke Übersetzung/Schreiben (EN→KO etc.)",
+      fr: "Traduction/écriture forte (EN→KO etc.)",
+      ru: "Сильный перевод/письмо (EN→KO и др.)",
+      hi: "मजबूत अनुवाद/लेखन (EN→KO आदि)"
+    },
+    link: "https://www.deepl.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "좋음", en: "Good", zh: "好", ja: "良い", de: "Gut", fr: "Bon", ru: "Хорошо", hi: "अच्छा" },
+    usage: 75 
+  },
+  { 
+    name: "QuillBot", 
+    category: "writing", 
+    desc: {
+      ko: "영어 패러프레이즈/요약(영어 학습용)",
+      en: "English paraphrasing/summarization (for learning)",
+      zh: "英语改写/摘要（学习用）",
+      ja: "英語言い換え/要約（学習用）",
+      de: "Englische Umschreibung/Zusammenfassung (zum Lernen)",
+      fr: "Paraphrase/résumé anglais (pour apprentissage)",
+      ru: "Английский перефразирование/резюме (для обучения)",
+      hi: "अंग्रेजी पैराफ्रेज/सारांश (सीखने के लिए)"
+    },
+    link: "https://quillbot.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "영어중심", en: "English-focused", zh: "英语为主", ja: "英語中心", de: "Englisch-fokussiert", fr: "Axé anglais", ru: "Англоязычный", hi: "अंग्रेजी-केंद्रित" },
+    usage: 63 
+  },
+  { 
+    name: "Photomath", 
+    category: "education", 
+    desc: {
+      ko: "수학 문제 촬영 → 풀이/해설",
+      en: "Math problem photo → solution/explanation",
+      zh: "数学问题拍照→解答/解释",
+      ja: "数学問題撮影→解答/解説",
+      de: "Matheproblem-Foto → Lösung/Erklärung",
+      fr: "Photo de problème math → solution/explication",
+      ru: "Фото математической задачи → решение/объяснение",
+      hi: "गणित समस्या फोटो → समाधान/व्याख्या"
+    },
+    link: "https://photomath.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "보통", en: "Medium", zh: "中等", ja: "普通", de: "Mittel", fr: "Moyen", ru: "Средне", hi: "मध्यम" },
+    usage: 71 
+  },
+  { 
+    name: "Wolfram|Alpha", 
+    category: "education", 
+    desc: {
+      ko: "계산/지식 질의응답(수학/과학)",
+      en: "Calculation/knowledge Q&A (math/science)",
+      zh: "计算/知识问答（数学/科学）",
+      ja: "計算/知識Q&A（数学/科学）",
+      de: "Berechnung/Wissen Q&A (Mathe/Naturwissenschaften)",
+      fr: "Calcul/Q&A connaissances (maths/sciences)",
+      ru: "Вычисления/Q&A знаний (математика/наука)",
+      hi: "गणना/ज्ञान Q&A (गणित/विज्ञान)"
+    },
+    link: "https://www.wolframalpha.com/", 
+    price: { ko: "무료+유료", en: "Free+Paid", zh: "免费+付费", ja: "無料+有料", de: "Kostenlos+Bezahlt", fr: "Gratuit+Payant", ru: "Бесплатно+Платно", hi: "मुफ़्त+भुगतान" },
+    ko: { ko: "영어중심", en: "English-focused", zh: "英语为主", ja: "英語中心", de: "Englisch-fokussiert", fr: "Axé anglais", ru: "Англоязычный", hi: "अंग्रेजी-केंद्रित" },
+    usage: 59 
+  }
+];
+
+// ==========================================
+// 3. 전역 변수 & 카테고리
+// ==========================================
+const CATEGORIES = ["all", "chat", "search", "image", "video", "audio", "coding", "writing", "design", "productivity", "education"];
+
+let currentLang = localStorage.getItem("lang") || "ko";
+let activeCategory = "all";
+let sortMode = "usage";
+
+// ==========================================
+// 4. DOM 요소
+// ==========================================
+const aiContainer = document.getElementById("aiContainer");
+const categoryButtons = document.getElementById("categoryButtons");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const translateBtn = document.getElementById("translateBtn");
+const langModal = document.getElementById("langModal");
+const langOptions = document.getElementById("langOptions");
+const siteTitle = document.getElementById("siteTitle");
+const siteDesc = document.getElementById("siteDesc");
+const footerNote = document.getElementById("footerNote");
+
+// ==========================================
+// 5. 번역 기능
+// ==========================================
+function t(key) {
+  return translations[currentLang][key] || translations["ko"][key] || key;
+}
+
+function updateUILanguage() {
+  const lang = translations[currentLang];
+  
+  // 제목/설명
+  siteTitle.textContent = lang.title;
+  siteDesc.textContent = lang.desc;
+  
+  // 검색창
+  searchInput.placeholder = lang.searchPlaceholder;
+  
+  // 정렬 옵션
+  sortSelect.innerHTML = `
+    <option value="usage">${lang.sortUsage}</option>
+    <option value="name">${lang.sortName}</option>
+  `;
+  sortSelect.value = sortMode;
+  
+  // 번역 버튼
+  translateBtn.textContent = lang.translateBtn;
+  
+  // 푸터
+  footerNote.textContent = lang.footerNote;
+  
+  // 카테고리 버튼 다시 렌더링
+  renderCategoryButtons();
+  
+  // AI 카드 다시 렌더링
+  render();
+}
+
+function openLangModal() {
+  langModal.classList.add("show");
+}
+
+function closeLangModal() {
+  langModal.classList.remove("show");
+}
+
+function selectLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  closeLangModal();
+  updateUILanguage();
+}
+
+function renderLangOptions() {
+  const languages = [
+    { code: "ko", name: "🇰🇷 한국어" },
+    { code: "en", name: "🇺🇸 English" },
+    { code: "zh", name: "🇨🇳 中文" },
+    { code: "ja", name: "🇯🇵 日本語" },
+    { code: "de", name: "🇩🇪 Deutsch" },
+    { code: "fr", name: "🇫🇷 Français" },
+    { code: "ru", name: "🇷🇺 Русский" },
+    { code: "hi", name: "🇮🇳 हिन्दी" }
+  ];
+  
+  langOptions.innerHTML = "";
+  languages.forEach(lang => {
+    const btn = document.createElement("button");
+    btn.className = "lang-btn" + (lang.code === currentLang ? " active" : "");
+    btn.textContent = lang.name;
+    btn.addEventListener("click", () => selectLanguage(lang.code));
+    langOptions.appendChild(btn);
+  });
+}
+
+// ==========================================
+// 6. 카테고리 버튼
+// ==========================================
+function renderCategoryButtons() {
+  categoryButtons.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "btn" + (cat === activeCategory ? " active" : "");
+    btn.textContent = t(cat);
+    btn.addEventListener("click", () => {
+      activeCategory = cat;
+      document.querySelectorAll("#categoryButtons .btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      render();
+    });
+    categoryButtons.appendChild(btn);
+  });
+}
+
+// ==========================================
+// 7. 필터 & 정렬
+// ==========================================
+function getFilteredData() {
+  const q = (searchInput.value || "").trim().toLowerCase();
+  return aiData.filter(item => {
+    const catOK = activeCategory === "all" ? true : item.category === activeCategory;
+    const desc = item.desc[currentLang] || item.desc["ko"] || "";
+    const searchOK = q === "" ? true :
+      item.name.toLowerCase().includes(q) ||
+      desc.toLowerCase().includes(q) ||
+      t(item.category).toLowerCase().includes(q);
+    return catOK && searchOK;
+  });
+}
+
+function sortData(list) {
+  const copy = [...list];
+  if (sortMode === "name") {
+    copy.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    copy.sort((a, b) => (b.usage ?? 0) - (a.usage ?? 0));
+  }
+  return copy;
+}
+
+// ==========================================
+// 8. 카드 렌더링
+// ==========================================
+function badgeColor(category) {
+  const map = {
+    chat: "rgba(106,168,255,0.25)",
+    search: "rgba(86,214,168,0.20)",
+    image: "rgba(255,120,120,0.18)",
+    video: "rgba(140,255,180,0.15)",
+    audio: "rgba(220,160,255,0.18)",
+    coding: "rgba(255,210,120,0.18)",
+    writing: "rgba(190,200,255,0.18)",
+    design: "rgba(255,160,220,0.16)",
+    productivity: "rgba(170,255,255,0.14)",
+    education: "rgba(255,255,160,0.14)"
+  };
+  return map[category] || "rgba(255,255,255,0.10)";
+}
+
+function display(list) {
+  aiContainer.innerHTML = "";
+
+  if (list.length === 0) {
+    aiContainer.innerHTML = `
+      <div class="card">
+        <h3>${t("noResults")}</h3>
+        <p class="desc">${t("noResultsDesc")}</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.style.background = badgeColor(item.category);
+    badge.textContent = t(item.category);
+
+    const h3 = document.createElement("h3");
+    h3.textContent = item.name;
+
+    const desc = document.createElement("p");
+    desc.className = "desc";
+    desc.textContent = item.desc[currentLang] || item.desc["ko"] || "";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const priceText = item.price[currentLang] || item.price["ko"] || "";
+    const koText = item.ko[currentLang] || item.ko["ko"] || "";
+    meta.innerHTML = `
+      <span class="chip">${t("priceLabel")}: ${priceText}</span>
+      <span class="chip">${t("koSupport")}: ${koText}</span>
+    `;
+
+    const usageWrap = document.createElement("div");
+    usageWrap.className = "usage";
+    const usageVal = Math.max(0, Math.min(100, item.usage ?? 0));
+    usageWrap.innerHTML = `
+      <div class="usage-row">
+        <span>${t("usageText")}</span>
+        <span>${usageVal}/100</span>
+      </div>
+      <div class="usage-bar"><div class="usage-fill" style="width:${usageVal}%"></div></div>
+    `;
+
+    const a = document.createElement("a");
+    a.className = "link";
+    a.href = item.link;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = t("goBtn");
+
+    card.appendChild(badge);
+    card.appendChild(h3);
+    card.appendChild(desc);
+    card.appendChild(meta);
+    card.appendChild(usageWrap);
+    card.appendChild(a);
+
+    aiContainer.appendChild(card);
+  });
+}
+
+function render() {
+  const filtered = getFilteredData();
+  const sorted = sortData(filtered);
+  display(sorted);
+}
+
+// ==========================================
+// 9. 이벤트 리스너
+// ==========================================
+searchInput.addEventListener("input", render);
+sortSelect.addEventListener("change", (e) => {
+  sortMode = e.target.value;
+  render();
+});
+translateBtn.addEventListener("click", openLangModal);
+langModal.addEventListener("click", (e) => {
+  if (e.target === langModal) closeLangModal();
+});
+
+// ==========================================
+// 10. 초기화
+// ==========================================
+renderLangOptions();
+updateUILanguage();
+body {
+    background-color: #121212; /* 어두운 배경 */
+    color: white; /* 흰 글씨 */
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 30px;
+}
+
+button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* AI 카드를 바둑판처럼 배치 */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* 개별 카드 디자인 */
+.ai-card {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+    transition: transform 0.2s;
+}
+
+.ai-card:hover {
+    transform: translateY(-5px); /* 마우스 올리면 살짝 뜸 */
+    border-color: #007bff;
+}
+
+.category {
+    font-size: 12px;
+    color: #888;
+    background: #333;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.ai-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #4da3ff;
+    text-decoration: none;
+    font-weight: bold;
+}/* ==========================================
+   번역 버튼 & 언어 모달
+   ========================================== */
+
+.translate-btn {
+  background: linear-gradient(135deg, #6a5af9, #4da3ff);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(106, 90, 249, 0.3);
+}
+
+.translate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 249, 0.5);
+}
+
+/* 언어 모달 */
+.lang-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.lang-modal.show {
+  display: flex;
+}
+
+.lang-modal-content {
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lang-modal-content h2 {
+  margin: 0 0 25px;
+  font-size: 20px;
+  color: #fff;
+}
+
+.lang-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.lang-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 14px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+  background: rgba(106, 168, 255, 0.2);
+  border-color: rgba(106, 168, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.lang-btn.active {
+  background: linear-gradient(135deg, rgba(106, 168, 255, 0.3), rgba(106, 90, 249, 0.3));
+  border-color: rgba(106, 168, 255, 0.6);
+  font-weight: bold;
+}
+
+/* 반응형 모달 */
+@media (max-width: 480px) {
+  .lang-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .lang-modal-content {
+    padding: 20px;
+  }
+}
