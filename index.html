@@ -10,36 +10,48 @@
   <div class="container">
     <header>
       <div class="brand">
-        <h1 id="siteTitle">🤖 AI 도구 모음</h1>
-        <p id="siteDesc">전 세계 AI들을 한눈에 비교하고 사용하세요.</p>
+        <h1 id="mainTitle">🤖 AI 도구 모음</h1>
+        <p id="mainDesc">카테고리별로 AI를 빠르게 찾고 바로 실행할 수 있게 정리했습니다.</p>
       </div>
 
+      <!-- ⭐ 검색창을 여기로 이동 -->
       <div class="top-actions">
-        <button id="translateBtn" class="translate-btn">🌐 언어 변경</button>
+        <input id="searchInput" type="text" placeholder="예: ChatGPT / 이미지 / 번역 / 영상" />
+        <button id="translateBtn" class="btn translate-btn">🌐 언어 변경</button>
         <select id="sortSelect" title="정렬">
-          <option value="usage">사용지수 높은순</option>
+          <option value="usage">사용률 높은순</option>
           <option value="name">이름순(A→Z)</option>
         </select>
       </div>
     </header>
 
+    <!-- ⭐ 카테고리 버튼만 여기 -->
     <div class="toolbar">
-      <input id="searchInput" type="text" placeholder="예: ChatGPT / 이미지 / 번역 / 영상" />
       <div id="categoryButtons" class="category-buttons"></div>
     </div>
 
     <div id="aiContainer" class="grid"></div>
 
     <div id="footerNote" class="footer-note">
-      ※ '사용지수(추정)'는 정확한 전세계 사용률이 아니라 비교용 지표입니다.
+      ※ 사용률은 추정치이며 비교용 지표입니다.
     </div>
   </div>
 
   <!-- 언어 선택 모달 -->
-  <div id="langModal" class="lang-modal">
-    <div class="lang-modal-content">
-      <h2>🌐 언어 선택 / Select Language</h2>
-      <div id="langOptions" class="lang-options"></div>
+  <div id="langModal" class="modal">
+    <div class="modal-content">
+      <h2>🌐 Select Language / 언어 선택</h2>
+      <div class="lang-grid">
+        <button class="lang-btn" data-lang="ko">🇰🇷 한국어</button>
+        <button class="lang-btn" data-lang="en">🇺🇸 English</button>
+        <button class="lang-btn" data-lang="zh">🇨🇳 中文</button>
+        <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+        <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+        <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+        <button class="lang-btn" data-lang="hi">🇮🇳 हिन्दी</button>
+      </div>
+      <button id="closeModal" class="btn close-modal">✕ 닫기 / Close</button>
     </div>
   </div>
 
